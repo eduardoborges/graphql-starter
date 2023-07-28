@@ -1,0 +1,95 @@
+version: '3.7'
+
+services:
+  microservice:
+    container_name: pombo-microservice
+    depends_on:
+      - postgresql
+      - rabbitmq
+      - mailhog
+    build:
+      context: .
+      target: DEV
+    command: ["npm", "run", "dev"]
+    environment:
+      NODE_ENV: development
+      APP_PORT: 3000
+      #
+      DATABASE_URL: postgres://postgres:postgres@postgresql:5432/postgres
+      #
+      AMQP_HOST: rabbitmq
+      AMQP_PASSWORD: rabbitmq
+      AMQP_PORT: 5672
+      AMQP_USER: rabbitmq
+      AMQP_VHOST: /
+      #
+      MAIL_HOST: mailhog
+      MAIL_SECURE: false
+      MAIL_PASSWORD: "pass"
+      MAIL_USERNAME: "user"
+      MAIL_PORT: 1025
+      MAIL_FROM_ADDRESS: pombo@inhousemarket.com.br
+      MAIL_FROM_NAME: "Pombo MS"
+
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/home/app
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:${APP_PORT}/']
+      interval: 1m
+      timeout: 10s
+      retries: 3
+
+  postgresql:
+    container_name: pombo-postgresql
+    image: bitnami/postgresql:15
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_volume:/bitnami/postgresql
+    environment:
+      POSTGRESQL_USER: postgres
+      POSTGRESQL_DATABASE: postgres
+      POSTGRESQL_PASSWORD: postgres
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'postgres']
+      interval: 1m
+      timeout: 10s
+      retries: 3
+
+  rabbitmq:
+    container_name: pombo-rabbitmq
+    build:
+      context: ./.docker/rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbitmq
+      RABBITMQ_DEFAULT_PASS: rabbitmq
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 1m
+      timeout: 10s
+      retries: 3
+
+  mailhog:
+    container_name: pombo-mailhog
+    image: mailhog/mailhog:latest
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+    healthcheck:
+      test: [ 'CMD', 'wget', '-q', '-O', '/dev/null', '-t', '1', '-T', '2', 'http://localhost:8025/api/v2/messages' ]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_volume:
+    driver: local
+
+networks:
+  default:
+    name: pombo-network

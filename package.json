@@ -1,0 +1,51 @@
+{
+  "name": "graphql-starter",
+  "version": "0.0.1",
+  "description": "GraphQL starter project",
+  "main": "./server.ts",
+  "scripts": {
+    "dev": "./scripts.sh dev",
+    "build": "./scripts.sh build",
+    "start": "./scripts.sh start",
+    "lint": "./scripts.sh lint",
+    "test": "./scripts.sh test"
+  },
+  "dependencies": {
+    "@jest/globals": "29.6.1",
+    "@semantic-release/changelog": "6.0.3",
+    "@semantic-release/commit-analyzer": "10.0.1",
+    "@semantic-release/git": "10.0.1",
+    "@semantic-release/github": "9.0.4",
+    "@semantic-release/npm": "10.0.4",
+    "@semantic-release/release-notes-generator": "11.0.4",
+    "eslint": "8.45.0",
+    "eslint-config-airbnb-base": "15.0.0",
+    "eslint-config-airbnb-typescript": "17.1.0",
+    "eslint-plugin-import": "2.27.5",
+    "eslint-plugin-perfectionist": "1.5.0",
+    "@typescript-eslint/eslint-plugin": "6.2.0",
+    "@typescript-eslint/parser": "6.2.0",
+    "@apollo/server": "4.9.0",
+    "@as-integrations/fastify": "^2.1.0",
+    "@fastify/cors": "8.3.0",
+    "@graphql-tools/load-files": "7.0.0",
+    "@graphql-tools/merge": "9.0.0",
+    "@graphql-tools/schema": "10.0.0",
+    "@prisma/client": "4.10.1",
+    "@types/graphql": "14.5.0",
+    "@types/node": "18.11.18",
+    "cors": "2.8.5",
+    "fastify": "4.11.0",
+    "graphql": "16.7.1",
+    "prisma": "4.16.2",
+    "reflect-metadata": "0.1.13",
+    "semantic-release": "21.0.7",
+    "ts-jest": "29.1.1",
+    "ts-node": "10.9.1",
+    "typescript": "5.1.6"
+
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

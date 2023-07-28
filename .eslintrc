@@ -1,0 +1,21 @@
+{
+  "extends": [
+    "airbnb-base",
+    "airbnb-typescript/base",
+    "plugin:perfectionist/recommended-natural"
+  ],
+  "ignorePatterns": ["node_modules/", "build/"],
+  "parserOptions": {
+    "project": "./tsconfig.eslint.json"
+  },
+  "rules": {
+    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "import/no-extraneous-dependencies": "off",
+    "import/prefer-default-export": "off",
+    "import/no-named-as-default": "off",
+    "no-console": "off",
+    "no-template-curly-in-string": "off",
+    "class-methods-use-this": "off",
+    "max-params": ["error", 4]
+  }
+}
