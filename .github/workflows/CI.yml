@@ -1,0 +1,82 @@
+name: CI
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - develop
+      - main
+
+jobs:
+  semantic-pr:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - uses: amannn/action-semantic-pull-request@v5
+
+  health-check:
+    needs: semantic-pr
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - '5432:5432'
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          cache: 'npm'
+          node-version: 18
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Lint with Reviewdog
+        uses: reviewdog/action-eslint@v1
+        with:
+          github_token: ${{ github.token }}
+          reporter: github-pr-review # Change reporter.
+          eslint_flags: 'src/'
+
+      - name: Test Unit
+        run: npm run test
+
+      - name: Setup LCOV
+        uses: hrishikesh-kadam/setup-lcov@v1
+        
+      - name: Report code coverage
+        uses: zgosalvez/github-actions-report-lcov@v3
+        with:
+          coverage-files: coverage/lcov.info
+          minimum-coverage: 75
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          update-comment: true
+
+      - name: Test App Build
+        run: npm run build
+
+      - name: Test Image Build
+        uses: docker/build-push-action@v4
+        
