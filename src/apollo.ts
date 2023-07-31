@@ -11,9 +11,11 @@ export default async (app: FastifyInstance) => {
     resolvers,
     typeDefs,
   });
+
   await apollo.start();
   await app.register(fastifyApollo(apollo), {
     context,
   });
+
   return apollo;
 };

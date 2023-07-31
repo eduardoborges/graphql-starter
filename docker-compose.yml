@@ -2,11 +2,9 @@ version: '3.7'
 
 services:
   microservice:
-    container_name: pombo-microservice
+    container_name: dummy-microservice
     depends_on:
       - postgresql
-      - rabbitmq
-      - mailhog
     build:
       context: .
       target: DEV
@@ -14,22 +12,8 @@ services:
     environment:
       NODE_ENV: development
       APP_PORT: 3000
-      #
+      APP_SECRET: 00000000000000000000000000000000
       DATABASE_URL: postgres://postgres:postgres@postgresql:5432/postgres
-      #
-      AMQP_HOST: rabbitmq
-      AMQP_PASSWORD: rabbitmq
-      AMQP_PORT: 5672
-      AMQP_USER: rabbitmq
-      AMQP_VHOST: /
-      #
-      MAIL_HOST: mailhog
-      MAIL_SECURE: false
-      MAIL_PASSWORD: "pass"
-      MAIL_USERNAME: "user"
-      MAIL_PORT: 1025
-      MAIL_FROM_ADDRESS: pombo@inhousemarket.com.br
-      MAIL_FROM_NAME: "Pombo MS"
 
     ports:
       - '3000:3000'
@@ -42,7 +26,7 @@ services:
       retries: 3
 
   postgresql:
-    container_name: pombo-postgresql
+    container_name: dummy-postgresql
     image: bitnami/postgresql:15
     ports:
       - '5432:5432'
@@ -58,38 +42,10 @@ services:
       timeout: 10s
       retries: 3
 
-  rabbitmq:
-    container_name: pombo-rabbitmq
-    build:
-      context: ./.docker/rabbitmq
-    ports:
-      - '5672:5672'
-      - '15672:15672'
-    environment:
-      RABBITMQ_DEFAULT_USER: rabbitmq
-      RABBITMQ_DEFAULT_PASS: rabbitmq
-    healthcheck:
-      test: rabbitmq-diagnostics -q ping
-      interval: 1m
-      timeout: 10s
-      retries: 3
-
-  mailhog:
-    container_name: pombo-mailhog
-    image: mailhog/mailhog:latest
-    ports:
-      - '1025:1025'
-      - '8025:8025'
-    healthcheck:
-      test: [ 'CMD', 'wget', '-q', '-O', '/dev/null', '-t', '1', '-T', '2', 'http://localhost:8025/api/v2/messages' ]
-      interval: 1m
-      timeout: 10s
-      retries: 3
-
 volumes:
   postgres_volume:
     driver: local
 
 networks:
   default:
-    name: pombo-network
+    name: dummy-network
